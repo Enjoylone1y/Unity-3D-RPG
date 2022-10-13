@@ -10,16 +10,22 @@ public class PlayerController : MonoBehaviour
     private bool jumpInput;
     private Vector3 move;
     private float verticalSpeed;
+    private float diffAngle;
+
     private RaycastHit hitInfo;
     private LayerMask canStandLayerMask;
 
     public bool isOnGround = true;
 
+    public GameObject playerFoot;
+    public GameObject renderCamera;
+
     public float moveSpeed;
     public float gravity;
     public float jumpSpeed;
-    public GameObject playerFoot;
+    public float rotationSpeed;
     public string[] canStandLayerNames;
+ 
 
     private void Awake()
     {
@@ -43,6 +49,7 @@ public class PlayerController : MonoBehaviour
         //checkIsLanding();
         isOnGround = controller.isGrounded;
 
+        CalculateRotation();
         CalculateMove();
         CalculateJump();
     }
@@ -53,10 +60,20 @@ public class PlayerController : MonoBehaviour
         // 根据输入和移动速度计算移动值    
         move = new Vector3(horizontalInput, 0, verticleInput);
         move *= moveSpeed * Time.deltaTime;
-        move += Vector3.up * verticalSpeed * Time.deltaTime;
+ 
+        // 摄像机面对的方向即为移动的正向
+        move = renderCamera.transform.TransformDirection(move);
 
-        // 根据角色面向方向改变移动方向
-        move = transform.TransformDirection(move);
+        // 移动的时候让人物方向和摄像机方向一致
+        if(move.x != 0 || move.z != 0)
+        {
+            // 避免Y值方向有值导致人物倾斜
+            move.y = 0;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(move), rotationSpeed);
+        }
+
+        // 竖直方向
+        move += Vector3.up * verticalSpeed * Time.deltaTime;
 
         // 交由CharatorController执行移动操作
         controller.Move(move);
@@ -81,6 +98,11 @@ public class PlayerController : MonoBehaviour
             }
             verticalSpeed += gravity * Time.deltaTime;
         }
+    }
+
+    private void CalculateRotation()
+    {
+
     }
 
     // 判断是否落到地上
