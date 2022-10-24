@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     private CharacterController controller;
     private float horizontalInput;
-    private float verticleInput;
+    private float verticalInput;
     private bool jumpInput;
     private Vector3 move;
     private float verticalSpeed;
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     {
         // 获取键盘输入值
         horizontalInput = Input.GetAxis("Horizontal");
-        verticleInput = Input.GetAxis("Vertical");
+        verticalInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButtonDown("Jump");
         //checkIsLanding();
         isOnGround = controller.isGrounded;
@@ -58,19 +58,21 @@ public class PlayerController : MonoBehaviour
     private void CalculateMove()
     {
         // 根据输入和移动速度计算移动值    
-        move = new Vector3(horizontalInput, 0, verticleInput);
-        move *= moveSpeed * Time.deltaTime;
- 
+        //move = new Vector3(horizontalInput, 0, verticalInput);
+        move = transform.forward * verticalInput * moveSpeed * Time.deltaTime;
+
         // 摄像机面对的方向即为移动的正向
-        move = renderCamera.transform.TransformDirection(move);
+        //move = renderCamera.transform.TransformDirection(move);
 
         // 移动的时候让人物方向和摄像机方向一致
-        if(move.x != 0 || move.z != 0)
-        {
-            // 避免Y值方向有值导致人物倾斜
-            move.y = 0;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(move), rotationSpeed);
-        }
+        //if(move.x != 0 || move.z != 0)
+        //{
+        //    // 避免Y值方向有值导致人物倾斜
+        //    move.y = 0;
+        //    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(move), rotationSpeed);
+        //}
+
+        transform.Rotate(Vector3.up, horizontalInput * rotationSpeed);
 
         // 竖直方向
         move += Vector3.up * verticalSpeed * Time.deltaTime;
