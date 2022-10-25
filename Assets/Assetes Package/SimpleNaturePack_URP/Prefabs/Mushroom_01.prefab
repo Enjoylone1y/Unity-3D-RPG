@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4561532801418109430}
   - component: {fileID: 4561532801419436502}
   - component: {fileID: 4561532801420403478}
+  - component: {fileID: 215890174195288001}
   m_Layer: 0
   m_Name: Mushroom_01
   m_TagString: Collectible
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4561532801418411478}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.5958705, y: 0.009105414, z: 3.2353277}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &215890174195288001
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4561532801418411478}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.2252474, y: 0.3406743, z: 0.22224516}
+  m_Center: {x: 0.0072517055, y: 0.1702209, z: 0.0030555155}
