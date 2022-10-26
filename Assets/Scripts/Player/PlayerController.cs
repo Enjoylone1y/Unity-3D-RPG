@@ -10,11 +10,12 @@ public class PlayerController : MonoBehaviour
     private bool jumpInput;
     private Vector3 move;
     private float verticalSpeed;
+    private Animator animator;
 
     //private float diffAngle;
     //private RaycastHit hitInfo;
 
-    //private LayerMask canStandLayerMask;
+    private LayerMask canStandLayerMask;
 
     public bool isOnGround = true;
 
@@ -23,15 +24,17 @@ public class PlayerController : MonoBehaviour
 
     public float moveSpeed;
     public float gravity;
-    public float jumpSpeed;
+    public float jumpHeight;
     public float rotationSpeed;
     public string[] canStandLayerNames;
+    public float checkRaduis;
  
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        //canStandLayerMask = LayerMask.GetMask(canStandLayerNames);
+        animator = GetComponent<Animator>();
+        canStandLayerMask = LayerMask.GetMask(canStandLayerNames);
     }
 
     // Start is called before the first frame update
@@ -47,12 +50,14 @@ public class PlayerController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButtonDown("Jump");
-        //checkIsLanding();
-        isOnGround = controller.isGrounded;
+        checkIsLanding();
+        //isOnGround = controller.isGrounded;
 
         //CalculateRotation();
-        CalculateMove();
         CalculateJump();
+        CalculateMove();
+
+        animator.SetFloat("MoveSpeed", controller.velocity.sqrMagnitude);
     }
 
     // 计算平面移动
@@ -88,17 +93,16 @@ public class PlayerController : MonoBehaviour
         if (isOnGround)
         {   if (jumpInput)
             {
-                isOnGround = false;
-                verticalSpeed = jumpSpeed;
+                verticalSpeed = Mathf.Sqrt(-2 * jumpHeight * gravity);
             }
         }
         else
         {
             // 如果跳跃上升过程中按住空格键则能跳得更高
-            if( verticalSpeed > 0 && jumpInput)
-            {
-                verticalSpeed += jumpSpeed * 0.5f * Time.deltaTime;
-            }
+            //if( verticalSpeed > 0 && jumpInput)
+            //{
+            //    verticalSpeed += jumpSpeed * 0.5f * Time.deltaTime;
+            //}
             verticalSpeed += gravity * Time.deltaTime;
         }
     }
@@ -108,9 +112,14 @@ public class PlayerController : MonoBehaviour
 
     //}
 
-    // 判断是否落到地上
-    //private void checkIsLanding()
-    //{
-    //   isOnGround = Physics.Raycast(playerFoot.transform.position, Vector3.down, 0.1f,canStandLayerMask);
-    //}    
+    // 判断是否落到地上.落到地面上时把Y方向速度设置为0
+    private void checkIsLanding()
+    {
+        // 球形检测
+        isOnGround = Physics.CheckSphere(playerFoot.transform.position, checkRaduis, canStandLayerMask);
+        if (isOnGround)
+        {
+            verticalSpeed = 0;
+        }
+    }
 }
