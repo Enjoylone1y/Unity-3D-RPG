@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     private float verticalInput;
     private bool jumpInput;
     private Vector3 move;
-    private float verticalSpeed;
+    private Vector3 jumpSpeed;
     private Animator animator;
 
     //private float diffAngle;
@@ -50,12 +50,11 @@ public class PlayerController : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButtonDown("Jump");
+        
         checkIsLanding();
         //isOnGround = controller.isGrounded;
-
-        //CalculateRotation();
-        CalculateJump();
         CalculateMove();
+        CalculateJump();
 
         animator.SetFloat("MoveSpeed", controller.velocity.sqrMagnitude);
     }
@@ -64,8 +63,12 @@ public class PlayerController : MonoBehaviour
     private void CalculateMove()
     {
         // 根据输入和移动速度计算移动值    
-        //move = new Vector3(horizontalInput, 0, verticalInput);
         move = transform.forward * verticalInput * moveSpeed * Time.deltaTime;
+
+        // 交由CharatorController执行移动操作
+        controller.Move(move);
+
+        //move = new Vector3(horizontalInput, 0, verticalInput);
 
         // 摄像机面对的方向即为移动的正向
         //move = renderCamera.transform.TransformDirection(move);
@@ -78,22 +81,18 @@ public class PlayerController : MonoBehaviour
         //    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(move), rotationSpeed);
         //}
 
+        // 转向
         transform.Rotate(Vector3.up, horizontalInput * rotationSpeed);
-
-        // 竖直方向
-        move += Vector3.up * verticalSpeed * Time.deltaTime;
-
-        // 交由CharatorController执行移动操作
-        controller.Move(move);
     }
 
     // 计算跳跃
     private void CalculateJump()
     {
         if (isOnGround)
-        {   if (jumpInput)
+        {
+            if (jumpInput)
             {
-                verticalSpeed = Mathf.Sqrt(-2 * jumpHeight * gravity);
+                jumpSpeed.y = Mathf.Sqrt(-2 * jumpHeight * gravity);
             }
         }
         else
@@ -103,23 +102,22 @@ public class PlayerController : MonoBehaviour
             //{
             //    verticalSpeed += jumpSpeed * 0.5f * Time.deltaTime;
             //}
-            verticalSpeed += gravity * Time.deltaTime;
+            jumpSpeed.y += gravity * Time.deltaTime;
         }
+
+        // 竖直方向
+        controller.Move(jumpSpeed * Time.deltaTime);
     }
 
-    //private void CalculateRotation()
-    //{
-
-    //}
 
     // 判断是否落到地上.落到地面上时把Y方向速度设置为0
     private void checkIsLanding()
     {
         // 球形检测
         isOnGround = Physics.CheckSphere(playerFoot.transform.position, checkRaduis, canStandLayerMask);
-        if (isOnGround)
+        if (isOnGround && jumpSpeed.y < 0)
         {
-            verticalSpeed = 0;
+            jumpSpeed.y = 0;
         }
     }
 }
